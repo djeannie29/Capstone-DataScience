@@ -5,8 +5,30 @@ from dash.dependencies import Input, Output
 import pandas as pd
 import plotly.express as px
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+external_stylesheets = ['bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+
+app.index_string = '''
+<!DOCTYPE html>
+<html>
+    <head>
+        {%metas%}
+        <title >IBM Data Science Capstone Project - Denise Jeannie Marti</title>
+        
+        {%css%}
+    </head>
+    <body>
+        <div><h3 style="text-align: center">IBM Data Science Capstone Project</h3></div>
+        {%app_entry%}
+        <footer>
+            {%config%}
+            {%scripts%}
+            {%renderer%}
+        </footer>
+        <div>Denise Jeannie Marti </div>
+    </body>
+</html>
+'''
 
 spacex_df = pd.read_csv("spacex_launch_dash.csv")
 max_payload = spacex_df['Payload Mass (kg)'].max()
@@ -17,11 +39,12 @@ launch_sites = []
 launch_sites.append({'label': 'All Sites', 'value': 'All Sites'})
 for launch_site in unique_launch_sites:
     launch_sites.append({'label': launch_site, 'value': launch_site})
-
+    
+    
 app.layout = html.Div(children=[
     html.Div([
         html.H1('SpaceX Launch Records Dashboard',
-            style={'textAlign': 'center', 'color': '#503D36','font-size': 40}),
+            style={'textAlign': 'center', 'color': 'white','font-size': 40}),
     ]),
     
     html.Div([
@@ -41,7 +64,7 @@ app.layout = html.Div(children=[
     html.Div([
         # TASK 3: Add a Range Slider to Select Payload
         html.Div("Payload range (Kg):", 
-            style={'color': '#503D36','font-size': 20, 'padding': '0 30px', 'margin-left': '11px'}
+            style={'color': '#FFFFF','font-size': 20, 'padding': '0 30px', 'margin-left': '11px'}
             ),
         html.Div([
             dcc.RangeSlider(
@@ -50,11 +73,11 @@ app.layout = html.Div(children=[
                 max = 10000,
                 step = 1000,
                 marks = {
-                        0: {'label': '0', 'style': {'color': '#77b0b1'}},
+                        0: {'label': '0', 'style': {'color': '#000000'}},
                         2500: {'label': '2500'},
                         5000: {'label': '5000'},
                         7500: {'label': '7500'},
-                        10000: {'label': '10000', 'style': {'color': '#f50'}},
+                        10000: {'label': '10000', 'style': {'color': '#000000'}},
                 },
                 value = [min_payload,max_payload]
             ),
@@ -77,14 +100,18 @@ def update_piegraph(site_dropdown):
                 all_sites,
                 names = 'Launch Site',
                 title = 'Total Success Launches by All Sites',
+                color_discrete_sequence=px.colors.sequential.RdBu,
             )
+        fig.update_layout(paper_bgcolor="#000")
     else:
         site_specific  = spacex_df.loc[spacex_df['Launch Site'] == site_dropdown]
         fig = px.pie(
                 site_specific,
                 names = 'class',
                 title = 'Total Success Launches for Site' +site_dropdown,
+                color_discrete_sequence=px.colors.sequential.RdBu,
             )
+        fig.update_layout(paper_bgcolor="#000")
     return fig
 
 # TASK 3, 4: Range Slider or Scatter Chart Callback
@@ -107,6 +134,8 @@ def update_scattergraph(site_dropdown,payload_slider):
                 size='Payload Mass (kg)',
                 hover_data=['Payload Mass (kg)']
             )
+        fig.update_layout(paper_bgcolor="#000")
+        
     else:
         low, high = payload_slider
         site_specific  = spacex_df.loc[spacex_df['Launch Site'] == site_dropdown]
@@ -120,6 +149,7 @@ def update_scattergraph(site_dropdown,payload_slider):
                 size='Payload Mass (kg)',
                 hover_data=['Payload Mass (kg)']
             )
+        fig.update_layout(paper_bgcolor="#000")
     return fig
 
 if __name__ == '__main__':
